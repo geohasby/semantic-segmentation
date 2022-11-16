@@ -12,7 +12,8 @@ class Metrics:
     def update(self, pred: Tensor, target: Tensor) -> None:
         pred = pred.argmax(dim=1)
         keep = target != self.ignore_label
-        self.hist += torch.bincount(target[keep] * self.num_classes + pred[keep], minlength=self.num_classes**2).view(self.num_classes, self.num_classes)
+        self.hist += torch.bincount(target[keep] * self.num_classes + pred[keep]).view(
+            self.num_classes, self.num_classes)
 
     def compute_iou(self) -> Tuple[Tensor, Tensor]:
         ious = self.hist.diag() / (self.hist.sum(0) + self.hist.sum(1) - self.hist.diag())
@@ -34,4 +35,3 @@ class Metrics:
         acc *= 100
         macc *= 100
         return acc.cpu().numpy().round(2).tolist(), round(macc, 2)
-
